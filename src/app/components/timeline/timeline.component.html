@@ -1,0 +1,115 @@
+<div class="timeline__scroll" #scrollEl (scroll)="onScroll()">
+  <div class="timeline__table" [style.--col-w.px]="scale().colWidth">
+    <div class="timeline__header-row">
+      <div class="timeline__corner">Work Center</div>
+      <div class="timeline__header">
+        @for (col of scale().columns; track col.start.getTime()) {
+          <div class="timeline__column-label">{{ col.label }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="timeline__content">
+      <aside class="timeline__centers" #centersEl>
+        @for (row of visibleRows(); track row.centerId) {
+          <div
+            class="timeline__center"
+            [class.timeline__center--first]="row.index === 0"
+            [class.timeline__center--hovered]="hover()?.row === row.index"
+            [style.top.px]="row.top"
+            [style.height.px]="row.height"
+          >
+            {{ row.centerName }}
+          </div>
+        }
+      </aside>
+
+      <div class="timeline__grid" [style.min-width.px]="scale().totalWidth">
+        <div
+          class="timeline__body"
+          [style.height.px]="bodyHeight()"
+          (mousemove)="onBodyMouseMove($event)"
+          (mouseleave)="onBodyMouseLeave()"
+          (click)="onBodyClick()"
+        >
+          @for (row of visibleRows(); track row.centerId) {
+            <div
+              class="timeline__row"
+              [style.top.px]="row.top"
+              [style.height.px]="row.height"
+              [class.timeline__row--hovered]="hover()?.row === row.index"
+            >
+              @for (bar of row.bars; track bar.doc.docId) {
+                <div
+                  class="timeline__bar"
+                  [class]="bar.statusClass"
+                  [style.left.px]="bar.left"
+                  [style.top.px]="row.barTop"
+                  [style.width.px]="bar.width"
+                  (click)="$event.stopPropagation()"
+                >
+                  <span class="timeline__bar-name">{{ bar.doc.data.name }}</span>
+                  <span class="timeline__bar-badge">{{ bar.statusLabel }}</span>
+                  <div ngbDropdown class="timeline__bar-menu" container="body" placement="bottom-start bottom-end">
+                    <button
+                      type="button"
+                      class="timeline__bar-dots"
+                      ngbDropdownToggle
+                      aria-label="Work order actions"
+                      (click)="$event.stopPropagation()"
+                    >
+                      <svg width="12" height="2" viewBox="0 0 12 2" fill="currentColor" aria-hidden="true">
+                        <circle cx="1" cy="1" r="1" />
+                        <circle cx="6" cy="1" r="1" />
+                        <circle cx="11" cy="1" r="1" />
+                      </svg>
+                    </button>
+                    <div ngbDropdownMenu class="timeline__menu">
+                      <button
+                        type="button"
+                        ngbDropdownItem
+                        class="timeline__menu-item"
+                        (click)="editRequested.emit(bar.doc)"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        ngbDropdownItem
+                        class="timeline__menu-item timeline__menu-item--delete"
+                        (click)="onDelete(bar.doc)"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (ghost(); as g) {
+            <div class="timeline__ghost" [style.left.px]="g.left" [style.top.px]="g.top" [style.width.px]="g.width"></div>
+            <div
+              class="timeline__tooltip"
+              [style.left.px]="g.left + g.width / 2"
+              [style.top.px]="g.tipTop"
+            >
+              Click to add dates
+            </div>
+          }
+
+        </div>
+
+        <div class="timeline__filler"></div>
+
+        @if (todayX(); as tx) {
+          <div class="timeline__today-line" [style.left.px]="tx"></div>
+        }
+        @if (currentChip(); as chip) {
+          <div class="timeline__current-chip" [style.left.px]="chip.left">{{ chip.label }}</div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

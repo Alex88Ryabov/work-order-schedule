@@ -1,0 +1,90 @@
+<div class="work-order-panel__overlay" (click)="close()"></div>
+
+<aside class="work-order-panel__dialog" role="dialog" aria-modal="true" aria-labelledby="wo-panel-title">
+  <header class="work-order-panel__header">
+    <div class="work-order-panel__titles">
+      <h2 id="wo-panel-title" class="work-order-panel__title">Work Order Details</h2>
+      <p class="work-order-panel__subtitle">Specify the dates, name and status for this order</p>
+    </div>
+    <div class="work-order-panel__actions">
+      <button type="button" class="work-order-panel__button work-order-panel__button--secondary" (click)="close()">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="work-order-panel__button work-order-panel__button--primary"
+        [disabled]="form.invalid"
+        (click)="save()"
+      >
+        {{ submitLabel }}
+      </button>
+    </div>
+  </header>
+
+  <form class="work-order-panel__form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="work-order-panel__field">
+      <label class="work-order-panel__label" for="wo-name">Work Order Name</label>
+      <input
+        id="wo-name"
+        class="work-order-panel__input"
+        type="text"
+        formControlName="name"
+        placeholder="Acme Inc."
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="work-order-panel__field">
+      <label class="work-order-panel__label">Status</label>
+      <ng-select
+        class="work-order-panel__select"
+        formControlName="status"
+        [items]="statuses"
+        bindValue="value"
+        [searchable]="false"
+        [clearable]="false"
+      >
+        <ng-template ng-label-tmp let-item="item">
+          <span class="status-chip" [class]="'status-chip--' + item.value">{{ item.label }}</span>
+        </ng-template>
+        <ng-template ng-option-tmp let-item="item">{{ item.label }}</ng-template>
+      </ng-select>
+    </div>
+
+    <div class="work-order-panel__field">
+      <label class="work-order-panel__label" for="wo-end">End date</label>
+      <input
+        id="wo-end"
+        class="work-order-panel__input"
+        formControlName="endDate"
+        ngbDatepicker
+        #endDp="ngbDatepicker"
+        (click)="endDp.open()"
+        placeholder="01.01.2026"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="work-order-panel__field">
+      <label class="work-order-panel__label" for="wo-start">Start date</label>
+      <input
+        id="wo-start"
+        class="work-order-panel__input"
+        formControlName="startDate"
+        ngbDatepicker
+        #startDp="ngbDatepicker"
+        (click)="startDp.open()"
+        placeholder="02.01.2026"
+        autocomplete="off"
+      />
+    </div>
+
+    @if (form.hasError('dateOrder')) {
+      <p class="work-order-panel__error">End date must be after the start date.</p>
+    } @else if (form.hasError('overlap')) {
+      <p class="work-order-panel__error">These dates overlap “{{ form.getError('overlap') }}” on the same work center.</p>
+    }
+
+    <button type="submit" hidden></button>
+  </form>
+</aside>

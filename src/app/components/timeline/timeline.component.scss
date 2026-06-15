@@ -1,0 +1,377 @@
+$centers-width: 382px;
+$header-height: 34px;
+
+:host {
+  display: block;
+  flex: 1;
+  min-height: 0;
+}
+
+.timeline {
+  // single scroll container for both axes; headers and the left column are sticky
+  &__scroll {
+    height: 100%;
+    overflow: auto;
+  }
+
+  &__table {
+    display: flex;
+    flex-direction: column;
+    min-width: 100%;
+    min-height: 100%;
+    width: max-content;
+  }
+
+  // ---------- sticky header band ----------
+  &__header-row {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    flex: 0 0 $header-height;
+    background: #fff;
+  }
+
+  &__corner {
+    position: sticky;
+    left: 0;
+    z-index: 30;
+    flex: 0 0 $centers-width;
+    width: $centers-width;
+    display: flex;
+    align-items: center;
+    padding: 0 16px 0 31px;
+    border-top: 1px solid var(--border-grid);
+    border-bottom: 1px solid var(--border-grid);
+    border-right: 1px solid var(--border-grid);
+    border-left: 1px solid var(--border-grid);
+    background: #fff;
+    font-weight: 450;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  &__header {
+    flex: 1;
+    display: flex;
+    border-top: 1px solid var(--border-grid);
+    border-bottom: 1px solid var(--border-grid);
+    background: #fff;
+  }
+
+  &__column-label {
+    flex: 0 0 var(--col-w);
+    width: var(--col-w);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 450;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  // ---------- content: sticky left column + grid ----------
+  &__content {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+  }
+
+  &__centers {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    flex: 0 0 $centers-width;
+    width: $centers-width;
+    border-right: 1px solid var(--border-grid);
+    border-left: 1px solid var(--border-grid);
+    background: #fff;
+  }
+
+  // rows are virtualized: only the visible ones exist, placed by an inline `top`
+  &__center {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    height: 49px;
+    padding: 0 16px 0 31px;
+    border-bottom: 1px solid var(--border-grid);
+    font-weight: 450;
+    font-size: 14px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &--first {
+      // the first row's extra height sits above the label so its text lines up
+      // at the top instead of centering in the taller row
+      padding-top: 16px;
+      border-bottom: none;
+    }
+
+    &--hovered {
+      background: var(--bg-header-row);
+    }
+  }
+
+  &__grid {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__body,
+  &__filler {
+    background-image: linear-gradient(to right, var(--border-grid) 1px, transparent 1px);
+    background-size: var(--col-w) 100%;
+    background-position: -1px 0;
+  }
+
+  &__body {
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+  &__filler {
+    flex: 1;
+    background-color: var(--bg-muted);
+  }
+
+  // ---------- rows ----------
+  &__row {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 49px;
+    cursor: pointer;
+
+    &--hovered {
+      background: var(--bg-row-hover);
+    }
+  }
+
+  // ---------- work order bars ----------
+  &__bar {
+    position: absolute;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 6px 0 8px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: default;
+    container-type: inline-size;
+    overflow: hidden;
+    z-index: 2;
+
+    &--open {
+      background: var(--status-open-bg);
+      border-color: var(--status-open-border);
+
+      .timeline__bar-badge {
+        background: var(--status-open-badge);
+        color: var(--status-open-text);
+      }
+    }
+
+    &--in-progress {
+      background: var(--status-in-progress-bg);
+      border-color: var(--status-in-progress-border);
+
+      .timeline__bar-badge {
+        background: var(--status-in-progress-badge);
+        color: var(--status-in-progress-text);
+      }
+    }
+
+    &--complete {
+      background: var(--status-complete-bg);
+      border-color: var(--status-complete-border);
+
+      .timeline__bar-badge {
+        background: var(--status-complete-badge);
+        color: var(--status-complete-text);
+      }
+    }
+
+    &--blocked {
+      background: var(--status-blocked-bg);
+      border-color: var(--status-blocked-border);
+
+      .timeline__bar-badge {
+        background: var(--status-blocked-badge);
+        color: var(--status-blocked-text);
+      }
+    }
+  }
+
+  &__bar-name {
+    flex: 0 1 auto;
+    min-width: 0;
+    height: 18px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  &__bar-badge {
+    flex: 0 0 auto;
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 5px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  &__bar-menu {
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  &__bar-dots {
+    &::after {
+      display: none; // bootstrap dropdown caret
+    }
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-heading);
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.12s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--bg-control-muted);
+    }
+  }
+
+  &__bar:hover &__bar-dots,
+  &__bar-dots[aria-expanded='true'] {
+    opacity: 1;
+  }
+
+  // drop the status badge as soon as it stops fitting next to the name and the
+  // menu button; the thresholds differ because the badge texts have different widths
+  @container (max-width: 120px) {
+    &__bar--open &__bar-badge {
+      display: none;
+    }
+  }
+
+  @container (max-width: 140px) {
+    &__bar--blocked &__bar-badge {
+      display: none;
+    }
+  }
+
+  @container (max-width: 150px) {
+    &__bar--complete &__bar-badge {
+      display: none;
+    }
+  }
+
+  @container (max-width: 165px) {
+    &__bar--in-progress &__bar-badge {
+      display: none;
+    }
+  }
+
+  // very narrow bar: the menu button does not fit next to the name, so it
+  // appears centered on top of the bar while hovering (or while its menu is open)
+  @container (max-width: 90px) {
+    &__bar-menu {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    &__bar:hover &__bar-menu,
+    &__bar-menu.show {
+      display: block;
+    }
+
+    &__bar:hover &__bar-name,
+    &__bar:has(&__bar-menu.show) &__bar-name {
+      visibility: hidden;
+    }
+  }
+
+  // ---------- ghost bar + tooltip ----------
+  &__ghost {
+    position: absolute;
+    height: 38px;
+    border-radius: 8px;
+    background: rgba(101, 112, 255, 0.1);
+    border: 1px solid #c3c7ff;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  &__tooltip {
+    position: absolute;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: var(--text-secondary);
+    color: var(--text-inverse);
+    font-size: 14px;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 0 16px -8px #e6ebf0, 0 2px 4px -2px #c8cfe9;
+    z-index: 5;
+  }
+
+  // ---------- today marker + current period chip ----------
+  &__today-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    margin-left: -1px;
+    background: var(--today-line);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &__current-chip {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 5px;
+    background: var(--chip-current-bg);
+    color: var(--accent-dark);
+    font-size: 14px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 4;
+  }
+}
