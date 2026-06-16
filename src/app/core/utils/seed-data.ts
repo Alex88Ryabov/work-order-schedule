@@ -40,7 +40,6 @@ function bulkData(today: Date): SeedData {
   const orders: WorkOrderDoc[] = [];
 
   for (const [family, count] of BULK_CENTER_GROUPS) {
-    // Repeat each family so the sample board holds a few thousand orders.
     for (let n = 1; n <= count * BULK_CENTER_MULTIPLIER; n++) {
       const center = createWorkCenterDoc({ name: `${family} ${n}` });
       centers.push(center);

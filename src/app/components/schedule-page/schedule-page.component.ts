@@ -22,7 +22,6 @@ export class SchedulePageComponent {
   protected readonly scaleOptions = SCALE_OPTIONS;
   protected readonly scaleControl = new FormControl<ScaleUnit>('month', { nonNullable: true });
 
-  // Chosen zoom level as a signal; drives the timeline columns.
   protected readonly scaleUnit = toSignal(this.scaleControl.valueChanges, {
     initialValue: this.scaleControl.value,
   });
@@ -31,7 +30,6 @@ export class SchedulePageComponent {
 
   protected readonly panelState = signal<PanelState | null>(null);
 
-  // "Today" button: scroll the timeline back to today.
   protected goToToday(): void {
     this.timeline().centerOnToday();
   }

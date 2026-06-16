@@ -142,7 +142,8 @@ body {
 
   .ng-arrow-wrapper {
     width: 28px;
-    padding-right: 12px;
+    padding-right: 2px;
+    padding-bottom: 2px;
 
     .ng-arrow {
       width: 8px;
@@ -150,11 +151,13 @@ body {
       border: none;
       background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'%3E%3Cpath d='M0.4 0.4L7.6 0.4L4 4.6Z' fill='%23687196' stroke='%23687196' stroke-width='0.8' stroke-linejoin='round'/%3E%3C/svg%3E")
         no-repeat center;
+      transition: transform 0.15s ease;
     }
   }
 
   &.ng-select-opened .ng-arrow-wrapper .ng-arrow {
     top: 0;
+    transform: rotate(180deg);
   }
 }
 
@@ -192,6 +195,7 @@ body {
       background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5.906'%3E%3Cpath d='M5.186 3.713L4.687 3.713L4.386 3.509L0.877 0.029L0 0.906L5 5.906L10 0.906L9.561 0.453L9.123 0L5.614 3.509Z' fill='%23687196'/%3E%3C/svg%3E")
         no-repeat center;
       background-size: contain;
+      transition: transform 0.15s ease;
     }
   }
 
@@ -201,6 +205,7 @@ body {
 
   &.ng-select-opened .ng-arrow-wrapper .ng-arrow {
     top: -1px;
+    transform: rotate(180deg);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 5.906'%3E%3Cpath d='M5.186 3.713L4.687 3.713L4.386 3.509L0.877 0.029L0 0.906L5 5.906L10 0.906L9.561 0.453L9.123 0L5.614 3.509Z' fill='%235659FF'/%3E%3C/svg%3E");
   }
 }

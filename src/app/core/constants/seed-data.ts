@@ -77,8 +77,8 @@ export const BULK_PRODUCTS = [
   'Turbine Blades', 'Cable Harnesses', 'Compressor Heads', 'Flange Sets', 'Gasket Kits',
 ] as const;
 
-export const BULK_HORIZON_DAYS = 240;
+// Orders are seeded this many days into the past and future from today.
+export const BULK_HORIZON_DAYS = 540;
 
-// Times each work-center family is repeated — pushes the board into the low
-// thousands of orders. Raise it for a denser dataset.
-export const BULK_CENTER_MULTIPLIER = 4;
+// How many times each work-center family is repeated.
+export const BULK_CENTER_MULTIPLIER = 1;

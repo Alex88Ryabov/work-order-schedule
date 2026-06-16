@@ -92,7 +92,6 @@ export class TimelineComponent {
     });
   }
 
-  // Scroll today's column to the middle of the grid.
   public centerOnToday(): void {
     const scroll = this.scrollRef().nativeElement;
     const gridViewport = scroll.clientWidth - this.centersRef().nativeElement.offsetWidth;

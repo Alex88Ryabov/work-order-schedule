@@ -28,7 +28,6 @@ export class WorkOrderPanelComponent {
 
   protected readonly statuses = WORK_ORDER_STATUSES;
 
-  // Button label: Create when adding, Save when editing.
   protected readonly submitLabel = computed(() => (this.state().mode === 'create' ? 'Create' : 'Save'));
 
   // True while the slide-out animation plays; the panel is removed once it finishes.
@@ -37,7 +36,6 @@ export class WorkOrderPanelComponent {
   private readonly dialogRef = viewChild.required<ElementRef<HTMLElement>>('dialog');
   private readonly nameRef = viewChild.required<ElementRef<HTMLInputElement>>('nameInput');
 
-  // Element to refocus once the panel closes.
   private returnFocusTo: HTMLElement | null = null;
 
   private ctx: { workCenterId: string; excludeId?: string } | null = null;
@@ -75,7 +73,6 @@ export class WorkOrderPanelComponent {
       }
     });
 
-    // Remember the previously focused element, then focus the first field.
     afterNextRender(() => {
       this.returnFocusTo = document.activeElement as HTMLElement | null;
       this.nameRef().nativeElement.focus();
