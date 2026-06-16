@@ -1,6 +1,13 @@
 <div class="work-order-panel__overlay" (click)="close()"></div>
 
-<aside class="work-order-panel__dialog" role="dialog" aria-modal="true" aria-labelledby="wo-panel-title">
+<div
+  #dialog
+  class="work-order-panel__dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="wo-panel-title"
+  (animationend)="onDialogAnimationEnd($event)"
+>
   <header class="work-order-panel__header">
     <div class="work-order-panel__titles">
       <h2 id="wo-panel-title" class="work-order-panel__title">Work Order Details</h2>
@@ -16,7 +23,7 @@
         [disabled]="form.invalid"
         (click)="save()"
       >
-        {{ submitLabel }}
+        {{ submitLabel() }}
       </button>
     </div>
   </header>
@@ -25,6 +32,7 @@
     <div class="work-order-panel__field">
       <label class="work-order-panel__label" for="wo-name">Work Order Name</label>
       <input
+        #nameInput
         id="wo-name"
         class="work-order-panel__input"
         type="text"
@@ -85,4 +93,4 @@
 
     <button type="submit" hidden></button>
   </form>
-</aside>
+</div>

@@ -330,6 +330,52 @@ $header-height: 34px;
     z-index: 5;
   }
 
+  &__bar-tip {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 320px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid var(--border-popover);
+    box-shadow: var(--shadow-popover);
+    pointer-events: none;
+    z-index: 6;
+
+    &--below {
+      transform: translate(-50%, 0);
+    }
+  }
+
+  &__bar-tip-name {
+    max-width: 300px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__bar-tip-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .status-chip {
+      flex: 0 0 auto;
+    }
+  }
+
+  &__bar-tip-range {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
   &__today-line {
     position: absolute;
     top: 0;

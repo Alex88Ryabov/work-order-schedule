@@ -40,6 +40,27 @@
 
   &__controls {
     margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__today {
+    height: 25px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: var(--shadow-control);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-dark);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--bg-control-muted);
+    }
   }
 
   &__timescale {

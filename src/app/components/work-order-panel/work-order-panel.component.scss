@@ -4,6 +4,7 @@
     inset: 0;
     background: rgba(247, 249, 252, 0.5);
     z-index: 90;
+    animation: work-order-panel-fade-in 0.2s ease;
   }
 
   &__dialog {
@@ -115,7 +116,7 @@
     padding: 0 9px;
     border: 1px solid var(--border-control);
     border-radius: 5px;
-    box-shadow: 0 1px 0.5px -1px #d8dceb, 0 1.5px 3px -1.5px #c8cfe9;
+    box-shadow: var(--shadow-input);
     font-family: inherit;
     font-size: 14px;
     font-weight: 450;
@@ -145,11 +146,46 @@
   }
 }
 
+:host(.work-order-panel--closing) .work-order-panel__overlay {
+  animation: work-order-panel-fade-out 0.2s ease forwards;
+}
+
+:host(.work-order-panel--closing) .work-order-panel__dialog {
+  animation: work-order-panel-slide-out 0.2s ease forwards;
+}
+
 @keyframes work-order-panel-slide-in {
   from {
     transform: translateX(100%);
   }
   to {
     transform: translateX(0);
+  }
+}
+
+@keyframes work-order-panel-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes work-order-panel-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes work-order-panel-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }

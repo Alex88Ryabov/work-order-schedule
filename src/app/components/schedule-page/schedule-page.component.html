@@ -8,6 +8,7 @@
   <h1 class="schedule-page__title">Work Orders</h1>
 
   <div class="schedule-page__controls">
+    <button type="button" class="schedule-page__today" (click)="goToToday()">Today</button>
     <div class="schedule-page__timescale">
       <span class="schedule-page__timescale-label">Timescale</span>
       <ng-select
@@ -24,7 +25,7 @@
 
   <app-timeline
     class="schedule-page__timeline"
-    [scale]="scale()"
+    [unit]="scaleUnit()"
     (createRequested)="onCreateRequested($event)"
     (editRequested)="onEditRequested($event)"
   />

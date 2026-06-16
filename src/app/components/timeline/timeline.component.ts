@@ -2,15 +2,23 @@ import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, NgZone, aft
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { STATUS_LABELS } from '../../core/constants/documents';
 import { BAR_HEIGHT, CENTERS_WIDTH, FIRST_ROW_EXTRA, HEADER_HEIGHT, ROW_HEIGHT, TIP_GAP, TIP_HEIGHT } from '../../core/constants/timeline';
-import { CreateRequest, GhostState, TimelineBar, TimelineRow, TimelineRowMeta } from '../../core/interfaces/timeline';
-import { TimelineScale } from '../../core/interfaces/timeline-scale';
+import { BarTooltip, CreateRequest, GhostState, TimelineBar, TimelineRow, TimelineRowMeta } from '../../core/interfaces/timeline';
+import { ScaleUnit, TimelineScale } from '../../core/interfaces/timeline-scale';
 import { WorkOrderDoc } from '../../core/models/documents';
-import { WorkOrderStore } from '../../core/services/work-order-store.service';
-import { addDays, fromIsoDate, startOfDay, toIsoDate } from '../../core/utils/date-utils';
-import { columnContaining, dateToX, xToDate } from '../../core/utils/timeline-scale';
+import { WorkOrderService } from '../../core/services/work-order.service';
+import { addDays, formatDateRange, fromIsoDate, startOfDay, toIsoDate } from '../../core/utils/date-utils';
+import { buildScale, columnContaining, dateToX, xToDate } from '../../core/utils/timeline-scale';
 
 const OVERSCAN_ROWS = 4;
 const OVERSCAN_X = 300;
+
+// Distance from an edge (px) before more columns load.
+const EDGE_PX = 240;
+// Columns added per load, per zoom. Big enough that one load clears the edge.
+const EXTEND_CHUNK: Record<ScaleUnit, number> = { month: 6, week: 8, day: 14, hour: 24 };
+// Cap so endless scrolling can't grow the column list forever.
+// @upgrade: window columns like rows for a truly infinite range.
+const MAX_COLUMNS = 600;
 
 @Component({
   selector: 'app-timeline',
@@ -21,11 +29,11 @@ const OVERSCAN_X = 300;
   host: { class: 'timeline' },
 })
 export class TimelineComponent {
-  protected readonly store = inject(WorkOrderStore);
+  protected readonly store = inject(WorkOrderService);
   private readonly ngZone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
 
-  public readonly scale = input.required<TimelineScale>();
+  public readonly unit = input.required<ScaleUnit>();
 
   public readonly createRequested = output<CreateRequest>();
   public readonly editRequested = output<WorkOrderDoc>();
@@ -40,9 +48,30 @@ export class TimelineComponent {
 
   private readonly centersWidth = signal(CENTERS_WIDTH);
 
+  // Extra columns added each side by infinite scroll, tagged with their zoom.
+  // When the zoom changes the tag stops matching and the scale resets itself.
+  private readonly extension = signal<{ unit: ScaleUnit; before: number; after: number } | null>(null);
+
+  // Extra columns for the current zoom (zero after a zoom change).
+  private extensionFor(unit: ScaleUnit): { before: number; after: number } {
+    const e = this.extension();
+    return e && e.unit === unit ? { before: e.before, after: e.after } : { before: 0, after: 0 };
+  }
+
+  // Full column model for the current zoom, including any scrolled-in columns.
+  protected readonly scale = computed(() => {
+    const unit = this.unit();
+    return buildScale(unit, this.extensionFor(unit).before, this.extensionFor(unit).after);
+  });
+
+  // True while we nudge scrollLeft after prepending, so it isn't read as an edge hit.
+  private adjustingScroll = false;
+
   constructor() {
+    // On zoom change, drop scrolled-in columns and re-centre on today.
+    // Tracks only the zoom, so growing columns on scroll won't recentre.
     effect(() => {
-      this.scale();
+      this.unit();
       requestAnimationFrame(() => {
         this.centerOnToday();
         this.measureCenters();
@@ -63,7 +92,8 @@ export class TimelineComponent {
     });
   }
 
-  private centerOnToday(): void {
+  // Scroll today's column to the middle of the grid.
+  public centerOnToday(): void {
     const scroll = this.scrollRef().nativeElement;
     const gridViewport = scroll.clientWidth - this.centersRef().nativeElement.offsetWidth;
     scroll.scrollLeft = Math.max(0, dateToX(this.scale(), new Date()) - gridViewport / 2);
@@ -75,6 +105,7 @@ export class TimelineComponent {
     requestAnimationFrame(() => {
       this.viewportUpdateQueued = false;
       this.readViewport();
+      this.maybeExtend();
     });
   };
 
@@ -82,6 +113,31 @@ export class TimelineComponent {
     this.measureCenters();
     this.onScroll();
   };
+
+  // Add columns when scrolling near either edge. Growing the left side shifts every
+  // column right, so we bump scrollLeft by the added width to keep the view steady.
+  private maybeExtend(): void {
+    if (this.adjustingScroll) return;
+    const el = this.scrollRef().nativeElement;
+    const scale = this.scale();
+    if (scale.columns.length >= MAX_COLUMNS) return;
+
+    const chunk = EXTEND_CHUNK[scale.unit];
+    const ext = this.extensionFor(scale.unit);
+    const gridRight = el.scrollLeft + (el.clientWidth - this.centersWidth());
+
+    if (el.scrollLeft < EDGE_PX) {
+      const prevWidth = el.scrollWidth;
+      this.extension.set({ unit: scale.unit, before: ext.before + chunk, after: ext.after });
+      this.adjustingScroll = true;
+      requestAnimationFrame(() => {
+        el.scrollLeft += el.scrollWidth - prevWidth;
+        this.adjustingScroll = false;
+      });
+    } else if (gridRight > scale.totalWidth - EDGE_PX) {
+      this.extension.set({ unit: scale.unit, before: ext.before, after: ext.after + chunk });
+    }
+  }
 
   private readViewport(): void {
     const el = this.scrollRef().nativeElement;
@@ -92,7 +148,7 @@ export class TimelineComponent {
     this.centersWidth.set(this.centersRef().nativeElement.offsetWidth);
   }
 
-  protected readonly hover = signal<{ row: number; ghostX: number | null } | null>(null);
+  protected readonly hover = signal<{ row: number; ghostX: number | null; barId: string | null } | null>(null);
 
   private readonly rows = computed<TimelineRowMeta[]>(() => {
     const byCenter = this.store.ordersByCenter();
@@ -115,6 +171,8 @@ export class TimelineComponent {
     return y < ROW_HEIGHT + FIRST_ROW_EXTRA ? 0 : Math.floor((y - FIRST_ROW_EXTRA) / ROW_HEIGHT);
   }
 
+  // Build only the rows and bars in the viewport (plus overscan), so a board with
+  // thousands of orders still renders a handful of elements.
   protected readonly visibleRows = computed<TimelineRow[]>(() => {
     const rows = this.rows();
     const scale = this.scale();
@@ -170,6 +228,29 @@ export class TimelineComponent {
     };
   });
 
+  // Popover shown while the pointer is over a bar (name, status, range).
+  protected readonly barTooltip = computed<BarTooltip | null>(() => {
+    const hover = this.hover();
+    if (!hover || !hover.barId) return null;
+    const row = this.visibleRows().find((r) => r.index === hover.row);
+    const bar = row?.bars.find((b) => b.doc.docId === hover.barId);
+    if (!row || !bar) return null;
+    // The first row hugs the header, so its tooltip goes below the bar instead of above.
+    const below = hover.row === 0;
+    const barTop = row.top + row.barTop;
+    return {
+      left: bar.left + bar.width / 2,
+      top: below ? barTop + BAR_HEIGHT + TIP_GAP : barTop - TIP_GAP,
+      below,
+      name: bar.doc.data.name,
+      status: bar.doc.data.status,
+      statusLabel: bar.statusLabel,
+      range: formatDateRange(bar.doc.data.startDate, bar.doc.data.endDate),
+    };
+  });
+
+  // Turn each order into a positioned bar. endDate is inclusive, so the bar runs to
+  // the start of the next day. Bars fully outside the viewport are skipped.
   private toBars(orders: WorkOrderDoc[], scale: TimelineScale, xMin: number, xMax: number): TimelineBar[] {
     const bars: TimelineBar[] = [];
     for (const doc of orders) {
@@ -202,15 +283,17 @@ export class TimelineComponent {
       return;
     }
 
-    const overBar = (event.target as HTMLElement).closest('.timeline__bar') !== null;
-    if (overBar) {
-      this.hover.set({ row, ghostX: null });
+    // Over a bar: show its details tooltip, no create-ghost.
+    const barEl = (event.target as HTMLElement).closest('.timeline__bar') as HTMLElement | null;
+    if (barEl) {
+      this.hover.set({ row, ghostX: null, barId: barEl.dataset['docId'] ?? null });
       return;
     }
 
+    // Over empty space: show the one-column create ghost centred on the pointer.
     const scale = this.scale();
     const ghostX = Math.max(0, Math.min(x - scale.colWidth / 2, scale.totalWidth - scale.colWidth));
-    this.hover.set({ row, ghostX });
+    this.hover.set({ row, ghostX, barId: null });
   }
 
   protected onBodyMouseLeave(): void {

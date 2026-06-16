@@ -1,5 +1,5 @@
 <div class="timeline__scroll" #scrollEl>
-  <div class="timeline__table" [style.--col-w.px]="scale().colWidth">
+  <div class="timeline__table" [style.--col-w]="scale().colWidth + 'px'">
     <div class="timeline__header-row">
       <div class="timeline__corner">Work Center</div>
       <div class="timeline__header">
@@ -43,6 +43,7 @@
                 <div
                   class="timeline__bar"
                   [class]="bar.statusClass"
+                  [attr.data-doc-id]="bar.doc.docId"
                   [style.left.px]="bar.left"
                   [style.top.px]="row.barTop"
                   [style.width.px]="bar.width"
@@ -96,6 +97,21 @@
               [style.top.px]="g.tipTop"
             >
               Click to add dates
+            </div>
+          }
+
+          @if (barTooltip(); as t) {
+            <div
+              class="timeline__bar-tip"
+              [class.timeline__bar-tip--below]="t.below"
+              [style.left.px]="t.left"
+              [style.top.px]="t.top"
+            >
+              <span class="timeline__bar-tip-name">{{ t.name }}</span>
+              <span class="timeline__bar-tip-meta">
+                <span class="status-chip" [class]="'status-chip--' + t.status">{{ t.statusLabel }}</span>
+                <span class="timeline__bar-tip-range">{{ t.range }}</span>
+              </span>
             </div>
           }
 
