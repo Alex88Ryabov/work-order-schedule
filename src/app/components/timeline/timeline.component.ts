@@ -234,11 +234,25 @@ export class TimelineComponent {
     const row = this.visibleRows().find((r) => r.index === hover.row);
     const bar = row?.bars.find((b) => b.doc.docId === hover.barId);
     if (!row || !bar) return null;
-    // The first row hugs the header, so its tooltip goes below the bar instead of above.
-    const below = hover.row === 0;
+    const view = this.viewport();
     const barTop = row.top + row.barTop;
+
+    // Put the tooltip below the bar when there is no room for it above inside the
+    // visible area: the first row hugs the header, or the bar has been scrolled up
+    // against it. Otherwise it sits above the bar.
+    const tipBoxHeight = 64; // name + status/date lines + padding, used for the flip test
+    const below = hover.row === 0 || barTop - view.top < TIP_GAP + tipBoxHeight;
+
+    // Keep the centred tooltip inside the visible grid so it isn't hidden behind the
+    // sticky centers column on the left or pushed past the right edge of the screen.
+    const tipHalfWidth = 168; // half the max tooltip width (320px) plus a small margin
+    const barCenter = bar.left + bar.width / 2;
+    const visLeft = view.left;
+    const visRight = view.left + view.width - this.centersWidth();
+    const left = Math.min(Math.max(barCenter, visLeft + tipHalfWidth), visRight - tipHalfWidth);
+
     return {
-      left: bar.left + bar.width / 2,
+      left,
       top: below ? barTop + BAR_HEIGHT + TIP_GAP : barTop - TIP_GAP,
       below,
       name: bar.doc.data.name,
