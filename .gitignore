@@ -40,6 +40,3 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
-
-# Local tooling (grepai), not part of the app
-docker-compose.yml
