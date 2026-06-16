@@ -1,4 +1,4 @@
-import { WorkOrderDoc } from '../models/documents';
+import { WorkOrderDoc, WorkOrderStatus } from '../models/documents';
 
 export interface CreateRequest {
   workCenterId: string;
@@ -36,4 +36,14 @@ export interface GhostState {
   width: number;
   top: number;
   tipTop: number;
+}
+
+export interface BarTooltip {
+  left: number;
+  top: number;
+  below: boolean;
+  name: string;
+  status: WorkOrderStatus;
+  statusLabel: string;
+  range: string;
 }

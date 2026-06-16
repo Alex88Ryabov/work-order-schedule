@@ -78,3 +78,7 @@ export const BULK_PRODUCTS = [
 ] as const;
 
 export const BULK_HORIZON_DAYS = 240;
+
+// Times each work-center family is repeated — pushes the board into the low
+// thousands of orders. Raise it for a denser dataset.
+export const BULK_CENTER_MULTIPLIER = 4;

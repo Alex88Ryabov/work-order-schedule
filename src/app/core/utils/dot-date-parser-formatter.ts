@@ -3,7 +3,7 @@ import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstra
 
 @Injectable()
 export class DotDateParserFormatter extends NgbDateParserFormatter {
-  parse(value: string): NgbDateStruct | null {
+  public parse(value: string): NgbDateStruct | null {
     if (!value) return null;
     const match = value.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
     if (!match) return null;
@@ -11,7 +11,7 @@ export class DotDateParserFormatter extends NgbDateParserFormatter {
     return { year, month, day };
   }
 
-  format(date: NgbDateStruct | null): string {
+  public format(date: NgbDateStruct | null): string {
     if (!date) return '';
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${pad(date.month)}.${pad(date.day)}.${date.year}`;

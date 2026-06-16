@@ -37,6 +37,15 @@ export function fromIsoDate(iso: string): Date {
   return new Date(y, m - 1, d);
 }
 
+// Two ranges clash when neither ends before the other starts. Inclusive, so
+// sharing a single boundary day already counts as overlapping.
 export function rangesOverlap(aStart: string, aEnd: string, bStart: string, bEnd: string): boolean {
   return aStart <= bEnd && bStart <= aEnd;
+}
+
+const RANGE_LABEL = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+// "Jan 5, 2026 – Mar 12, 2026" label for an order's span.
+export function formatDateRange(startIso: string, endIso: string): string {
+  return `${RANGE_LABEL.format(fromIsoDate(startIso))} – ${RANGE_LABEL.format(fromIsoDate(endIso))}`;
 }
