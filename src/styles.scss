@@ -47,6 +47,7 @@
 
   --border-grid: #e6ebf0;
   --border-control: #d8dceb;
+  --border-popover: rgba(104, 113, 150, 0.1);
 
   --bg-page: #ffffff;
   --bg-muted: #f7f9fc;
@@ -60,6 +61,7 @@
   --shadow-control: 1px 2.5px 3px -1.5px #c8cfe9;
   --shadow-popover: 0 4.5px 5px -1px #d8dceb, 0 2.5px 3px -1.5px #c8cfe9;
   --shadow-panel: 0 5px 15px 0 rgba(216, 220, 235, 1) , 0 2.5px 3px -1.5px rgba(200, 207, 233, 1) , 0 4.5px 5px -1px rgba(216, 220, 235, 1);
+  --shadow-input: 0 1px 0.5px -1px #d8dceb, 0 1.5px 3px -1.5px #c8cfe9;
 
 
   --status-open-bg: #f2feff;
@@ -114,7 +116,7 @@ body {
     height: 38px;
     border: 1px solid var(--border-control);
     border-radius: 5px;
-    box-shadow: 0 1px 0.5px -1px #d8dceb, 0 1.5px 3px -1.5px #c8cfe9;
+    box-shadow: var(--shadow-input);
     font-size: 14px;
     color: var(--text-primary);
     cursor: pointer;
@@ -211,7 +213,7 @@ body {
 .ng-select.work-order-panel__select .ng-dropdown-panel,
 .ng-select.schedule-page__timescale-select .ng-dropdown-panel {
   margin-top: 6px;
-  border: 1px solid rgba(104, 113, 150, 0.1);
+  border: 1px solid var(--border-popover);
   border-radius: 5px;
   background: #fff;
   box-shadow: var(--shadow-popover);
@@ -249,7 +251,7 @@ body {
   min-width: 200px;
   margin-top: 3px;
   padding: 12px 0;
-  border: 1px solid rgba(104, 113, 150, 0.1);
+  border: 1px solid var(--border-popover);
   border-radius: 5px;
   background: #fff;
   box-shadow: var(--shadow-popover);
@@ -294,6 +296,7 @@ body {
   font-size: 14px;
   font-weight: 450;
   line-height: 17px;
+  white-space: nowrap;
 
   &.status-chip--open {
     background: var(--status-open-badge);
@@ -321,7 +324,7 @@ body {
 }
 
 ngb-datepicker.dropdown-menu {
-  border: 1px solid rgba(104, 113, 150, 0.1);
+  border: 1px solid var(--border-popover);
   border-radius: 5px;
   box-shadow: var(--shadow-popover);
   font-family: var(--font-family);
