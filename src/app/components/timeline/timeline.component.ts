@@ -147,7 +147,7 @@ export class TimelineComponent {
     this.centersWidth.set(this.centersRef().nativeElement.offsetWidth);
   }
 
-  protected readonly hover = signal<{ row: number; ghostX: number | null; barId: string | null } | null>(null);
+  protected readonly hover = signal<{ row: number; ghostX: number | null; barId: string | null; pointerX: number } | null>(null);
 
   private readonly rows = computed<TimelineRowMeta[]>(() => {
     const byCenter = this.store.ordersByCenter();
@@ -243,13 +243,12 @@ export class TimelineComponent {
     const tipBoxHeight = 64; // name + status/date lines + padding, used for the flip test
     const below = hover.row === 0 || barTop - view.top < TIP_GAP + tipBoxHeight;
 
-    // Keep the centred tooltip inside the visible grid so it isn't hidden behind the
-    // sticky centers column on the left or pushed past the right edge of the screen.
+    // Follow the pointer horizontally, but keep the tooltip inside the visible grid so it
+    // isn't hidden behind the sticky centers column on the left or pushed past the right edge.
     const tipHalfWidth = 168; // half the max tooltip width (320px) plus a small margin
-    const barCenter = bar.left + bar.width / 2;
     const visLeft = view.left;
     const visRight = view.left + view.width - this.centersWidth();
-    const left = Math.min(Math.max(barCenter, visLeft + tipHalfWidth), visRight - tipHalfWidth);
+    const left = Math.min(Math.max(hover.pointerX, visLeft + tipHalfWidth), visRight - tipHalfWidth);
 
     return {
       left,
@@ -299,14 +298,14 @@ export class TimelineComponent {
     // Over a bar: show its details tooltip, no create-ghost.
     const barEl = (event.target as HTMLElement).closest('.timeline__bar') as HTMLElement | null;
     if (barEl) {
-      this.hover.set({ row, ghostX: null, barId: barEl.dataset['docId'] ?? null });
+      this.hover.set({ row, ghostX: null, barId: barEl.dataset['docId'] ?? null, pointerX: x });
       return;
     }
 
     // Over empty space: show the one-column create ghost centred on the pointer.
     const scale = this.scale();
     const ghostX = Math.max(0, Math.min(x - scale.colWidth / 2, scale.totalWidth - scale.colWidth));
-    this.hover.set({ row, ghostX, barId: null });
+    this.hover.set({ row, ghostX, barId: null, pointerX: x });
   }
 
   protected onBodyMouseLeave(): void {

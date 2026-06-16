@@ -77,8 +77,8 @@ export const BULK_PRODUCTS = [
   'Turbine Blades', 'Cable Harnesses', 'Compressor Heads', 'Flange Sets', 'Gasket Kits',
 ] as const;
 
-// Orders are seeded this many days into the past and future from today.
-export const BULK_HORIZON_DAYS = 540;
+// Orders are seeded this many days into the past and future from today (~15 months each way).
+export const BULK_HORIZON_DAYS = 450;
 
 // How many times each work-center family is repeated.
-export const BULK_CENTER_MULTIPLIER = 1;
+export const BULK_CENTER_MULTIPLIER = 3;

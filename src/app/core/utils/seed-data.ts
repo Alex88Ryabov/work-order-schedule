@@ -49,7 +49,7 @@ function bulkData(today: Date): SeedData {
         const gap = rnd() < 0.3 ? randomInt(rnd, 14, 40) : randomInt(rnd, 2, 14);
         const start = addDays(cursor, gap);
         if (start.getTime() > horizonEnd.getTime()) break;
-        const end = addDays(start, rnd() < 0.2 ? randomInt(rnd, 14, 35) : randomInt(rnd, 45, 150));
+        const end = addDays(start, randomInt(rnd, 45, 120)); // each order runs 1.5–4 months
         orders.push(
           createWorkOrderDoc({
             name: `${pick(rnd, BULK_OPERATIONS)} ${pick(rnd, BULK_PRODUCTS)} (Lot ${randomInt(rnd, 1000, 9999)})`,
