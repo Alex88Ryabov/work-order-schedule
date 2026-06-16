@@ -13,6 +13,8 @@ export class WorkOrderService {
 
   public readonly workCenters = this.workCentersState.asReadonly();
 
+  public readonly orderCount = computed(() => this.workOrdersState().length);
+
   public readonly ordersByCenter = computed(() => {
     const map = new Map<string, WorkOrderDoc[]>();
     for (const order of this.workOrdersState()) {

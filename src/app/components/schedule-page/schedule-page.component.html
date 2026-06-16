@@ -5,7 +5,10 @@
 </header>
 
 <main class="schedule-page__main">
-  <h1 class="schedule-page__title">Work Orders</h1>
+  <h1 class="schedule-page__title">
+    <span>Work Orders</span>
+    <span class="schedule-page__count">{{ store.orderCount() | number }} orders</span>
+  </h1>
 
   <div class="schedule-page__controls">
     <div class="schedule-page__timescale">

@@ -32,10 +32,22 @@
 
   &__title {
     margin: 47px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
     font-size: 24px;
     font-weight: 500;
     line-height: 34px;
     color: var(--text-primary);
+  }
+
+  &__count {
+    padding-left: 14px;
+    border-left: 1px solid var(--border-control);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--text-secondary);
   }
 
   &__controls {
