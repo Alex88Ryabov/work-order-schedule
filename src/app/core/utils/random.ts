@@ -1,7 +1,3 @@
-/**
- * Seeded random generator (mulberry32): the same seed always produces the same
- * sequence, so the demo data is identical on every reload. Returns [0, 1).
- */
 export function mulberry32(seed: number): () => number {
   let state = seed >>> 0;
   return () => {
@@ -13,7 +9,6 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-/** Random integer between min and max, both included. */
 export function randomInt(rnd: () => number, min: number, max: number): number {
   return min + Math.floor(rnd() * (max - min + 1));
 }

@@ -14,14 +14,12 @@ export interface TimelineBar {
   statusLabel: string;
 }
 
-/** One work center row: just the data, no geometry. Covers all rows, visible or not. */
 export interface TimelineRowMeta {
   centerId: string;
   centerName: string;
   orders: WorkOrderDoc[];
 }
 
-/** A row prepared for rendering: its position in the full list plus only the bars worth drawing. */
 export interface TimelineRow {
   index: number;
   centerId: string;

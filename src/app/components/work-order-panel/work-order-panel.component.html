@@ -52,28 +52,26 @@
     </div>
 
     <div class="work-order-panel__field">
-      <label class="work-order-panel__label" for="wo-end">End date</label>
+      <label class="work-order-panel__label">End date</label>
       <input
-        id="wo-end"
         class="work-order-panel__input"
         formControlName="endDate"
         ngbDatepicker
         #endDp="ngbDatepicker"
-        (click)="endDp.open()"
+        (click)="startDp.close(); endDp.open()"
         placeholder="01.01.2026"
         autocomplete="off"
       />
     </div>
 
     <div class="work-order-panel__field">
-      <label class="work-order-panel__label" for="wo-start">Start date</label>
+      <label class="work-order-panel__label">Start date</label>
       <input
-        id="wo-start"
         class="work-order-panel__input"
         formControlName="startDate"
         ngbDatepicker
         #startDp="ngbDatepicker"
-        (click)="startDp.open()"
+        (click)="endDp.close(); startDp.open()"
         placeholder="02.01.2026"
         autocomplete="off"
       />

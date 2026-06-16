@@ -1,7 +1,7 @@
 :host {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100svh;
   overflow: hidden;
 }
 
@@ -49,6 +49,12 @@
     border-radius: 5px;
     background: #fff;
     box-shadow: var(--shadow-control);
+
+    ::ng-deep {
+      .ng-select.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
+        box-shadow: none;
+      }
+    }
   }
 
   &__timescale-label {
@@ -68,5 +74,18 @@
 
   &__timeline {
     margin-top: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .schedule-page {
+    &__topbar,
+    &__main {
+      padding-left: 16px;
+    }
+
+    &__title {
+      margin-top: 24px;
+    }
   }
 }

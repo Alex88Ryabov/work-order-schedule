@@ -12,7 +12,6 @@ export class WorkOrderStore {
   private readonly workOrdersState = signal<WorkOrderDoc[]>(this.seeded.orders);
 
   readonly workCenters = this.workCentersState.asReadonly();
-  readonly workOrders = this.workOrdersState.asReadonly();
 
   readonly ordersByCenter = computed(() => {
     const map = new Map<string, WorkOrderDoc[]>();
@@ -40,7 +39,6 @@ export class WorkOrderStore {
     this.workOrdersState.update((orders) => orders.filter((o) => o.docId !== id));
   }
 
-  /** First work order on the same work center whose [start, end] intersects the given range. */
   findOverlap(data: Pick<WorkOrderData, 'workCenterId' | 'startDate' | 'endDate'>, excludeId?: string): WorkOrderDoc | null {
     return (
       this.workOrdersState().find(

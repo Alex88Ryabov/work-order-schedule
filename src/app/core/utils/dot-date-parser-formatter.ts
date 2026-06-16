@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
-/** Formats NgbDateStruct as MM.DD.YYYY (e.g. "12.30.2025"). */
 @Injectable()
 export class DotDateParserFormatter extends NgbDateParserFormatter {
   parse(value: string): NgbDateStruct | null {

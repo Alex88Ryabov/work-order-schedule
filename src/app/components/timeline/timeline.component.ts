@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, NgZone, afterNextRender, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
+import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { STATUS_LABELS } from '../../core/constants/documents';
 import { BAR_HEIGHT, CENTERS_WIDTH, FIRST_ROW_EXTRA, HEADER_HEIGHT, ROW_HEIGHT, TIP_GAP, TIP_HEIGHT } from '../../core/constants/timeline';
 import { CreateRequest, GhostState, TimelineBar, TimelineRow, TimelineRowMeta } from '../../core/interfaces/timeline';
@@ -9,7 +9,6 @@ import { WorkOrderStore } from '../../core/services/work-order-store.service';
 import { addDays, fromIsoDate, startOfDay, toIsoDate } from '../../core/utils/date-utils';
 import { columnContaining, dateToX, xToDate } from '../../core/utils/timeline-scale';
 
-/** Extra rows / pixels rendered around the visible area so fast scrolling never shows a gap. */
 const OVERSCAN_ROWS = 4;
 const OVERSCAN_X = 300;
 
@@ -19,10 +18,12 @@ const OVERSCAN_X = 300;
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'timeline', '(window:resize)': 'onScroll()' },
+  host: { class: 'timeline' },
 })
 export class TimelineComponent {
   protected readonly store = inject(WorkOrderStore);
+  private readonly ngZone = inject(NgZone);
+  private readonly destroyRef = inject(DestroyRef);
 
   public readonly scale = input.required<TimelineScale>();
 
@@ -32,23 +33,32 @@ export class TimelineComponent {
   private readonly scrollRef = viewChild.required<ElementRef<HTMLElement>>('scrollEl');
   private readonly centersRef = viewChild.required<ElementRef<HTMLElement>>('centersEl');
 
-  protected readonly headerHeight = HEADER_HEIGHT;
+  private readonly isTouch = window.matchMedia('(hover: none)').matches;
 
-  /**
-   * The part of the scroll box currently visible. Rows and bars outside it are
-   * not rendered — with thousands of orders the full grid would be too much DOM.
-   */
   private readonly viewport = signal({ top: 0, left: 0, width: 1600, height: 900 });
   private viewportUpdateQueued = false;
 
+  private readonly centersWidth = signal(CENTERS_WIDTH);
+
   constructor() {
-    // Center the viewport on today on load and on every zoom change; rAF defers
-    // the scroll until the new column widths have actually been rendered.
     effect(() => {
       this.scale();
       requestAnimationFrame(() => {
         this.centerOnToday();
+        this.measureCenters();
         this.readViewport();
+      });
+    });
+
+    afterNextRender(() => {
+      const el = this.scrollRef().nativeElement;
+      this.ngZone.runOutsideAngular(() => {
+        el.addEventListener('scroll', this.onScroll, { passive: true });
+        window.addEventListener('resize', this.onResize, { passive: true });
+      });
+      this.destroyRef.onDestroy(() => {
+        el.removeEventListener('scroll', this.onScroll);
+        window.removeEventListener('resize', this.onResize);
       });
     });
   }
@@ -59,25 +69,31 @@ export class TimelineComponent {
     scroll.scrollLeft = Math.max(0, dateToX(this.scale(), new Date()) - gridViewport / 2);
   }
 
-  /** Collapses a burst of scroll/resize events into one viewport update per frame. */
-  protected onScroll(): void {
+  private readonly onScroll = (): void => {
     if (this.viewportUpdateQueued) return;
     this.viewportUpdateQueued = true;
     requestAnimationFrame(() => {
       this.viewportUpdateQueued = false;
       this.readViewport();
     });
-  }
+  };
+
+  private readonly onResize = (): void => {
+    this.measureCenters();
+    this.onScroll();
+  };
 
   private readViewport(): void {
     const el = this.scrollRef().nativeElement;
     this.viewport.set({ top: el.scrollTop, left: el.scrollLeft, width: el.clientWidth, height: el.clientHeight });
   }
 
-  /** Row under the cursor; ghostX is null while hovering an existing bar. */
+  private measureCenters(): void {
+    this.centersWidth.set(this.centersRef().nativeElement.offsetWidth);
+  }
+
   protected readonly hover = signal<{ row: number; ghostX: number | null } | null>(null);
 
-  /** All rows (every work center with its orders), without any bar geometry. */
   private readonly rows = computed<TimelineRowMeta[]>(() => {
     const byCenter = this.store.ordersByCenter();
     return this.store.workCenters().map((center) => ({
@@ -91,17 +107,14 @@ export class TimelineComponent {
     this.rows().length ? this.rows().length * ROW_HEIGHT + FIRST_ROW_EXTRA : 0,
   );
 
-  /** Top offset of a row; the first row is taller, so everything below it is pushed down. */
   private rowTop(index: number): number {
     return index === 0 ? 0 : index * ROW_HEIGHT + FIRST_ROW_EXTRA;
   }
 
-  /** Row index under a y offset inside the body (accounts for the taller first row). */
   private rowAtY(y: number): number {
     return y < ROW_HEIGHT + FIRST_ROW_EXTRA ? 0 : Math.floor((y - FIRST_ROW_EXTRA) / ROW_HEIGHT);
   }
 
-  /** Only the rows inside the viewport, with bar geometry computed just for them. */
   protected readonly visibleRows = computed<TimelineRow[]>(() => {
     const rows = this.rows();
     const scale = this.scale();
@@ -110,10 +123,8 @@ export class TimelineComponent {
     const first = Math.max(0, Math.floor(Math.max(0, vp.top - HEADER_HEIGHT) / ROW_HEIGHT) - OVERSCAN_ROWS);
     const last = Math.min(rows.length, first + Math.ceil(vp.height / ROW_HEIGHT) + OVERSCAN_ROWS * 2);
 
-    // Horizontal window in grid coordinates; the sticky centers column hides
-    // the first CENTERS_WIDTH pixels of the viewport.
     const xMin = vp.left - OVERSCAN_X;
-    const xMax = vp.left + (vp.width - CENTERS_WIDTH) + OVERSCAN_X;
+    const xMax = vp.left + (vp.width - this.centersWidth()) + OVERSCAN_X;
 
     const out: TimelineRow[] = [];
     for (let i = first; i < last; i++) {
@@ -159,7 +170,6 @@ export class TimelineComponent {
     };
   });
 
-  /** Bars for one row, clipped to the grid and skipped entirely when outside the viewport window. */
   private toBars(orders: WorkOrderDoc[], scale: TimelineScale, xMin: number, xMax: number): TimelineBar[] {
     const bars: TimelineBar[] = [];
     for (const doc of orders) {
@@ -217,6 +227,13 @@ export class TimelineComponent {
       startDate: toIsoDate(start),
       endDate: toIsoDate(addDays(start, 7)),
     });
+  }
+
+  protected onBarClick(event: MouseEvent, menu: NgbDropdown): void {
+    event.stopPropagation();
+    if (this.isTouch) {
+      menu.toggle();
+    }
   }
 
   protected onDelete(doc: WorkOrderDoc): void {

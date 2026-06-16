@@ -22,7 +22,6 @@
     animation: work-order-panel-slide-in 0.25s ease;
   }
 
-  // ---------- header ----------
   &__header {
     display: flex;
     align-items: flex-start;
@@ -87,7 +86,6 @@
     }
   }
 
-  // ---------- body / fields ----------
   &__form {
     flex: 1;
     min-height: 0;
@@ -133,6 +131,11 @@
       border-color: var(--accent-soft);
       box-shadow: 0 0 0 1px var(--accent-soft);
     }
+  }
+
+  &__field:has(ngb-datepicker) &__input {
+    border-color: var(--accent-soft);
+    box-shadow: 0 0 0 1px var(--accent-soft);
   }
 
   &__error {

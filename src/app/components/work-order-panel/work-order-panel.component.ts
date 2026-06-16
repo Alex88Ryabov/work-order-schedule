@@ -25,7 +25,6 @@ export class WorkOrderPanelComponent {
 
   protected readonly statuses = WORK_ORDER_STATUSES;
 
-  /** Overlap-validation context; set once the state input is available. */
   private ctx: { workCenterId: string; excludeId?: string } | null = null;
 
   protected readonly form = this.fb.group(
@@ -69,7 +68,6 @@ export class WorkOrderPanelComponent {
 
     const startDate = structToIso(start);
     const endDate = structToIso(end);
-    // End date must be strictly after the start date.
     if (startDate >= endDate) return { dateOrder: true };
 
     const conflict = this.store.findOverlap(

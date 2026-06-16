@@ -8,10 +8,6 @@ function hourLabel(d: Date): string {
   return d.getHours() === 0 ? DAY_LABEL.format(d) : `${String(d.getHours()).padStart(2, '0')}:00`;
 }
 
-/**
- * Builds contiguous columns centered on now. Buffer around today: ±2 weeks for
- * Day, ±2 months for Week, ±6 months for Month, ±30 hours for Hour.
- */
 export function buildScale(unit: ScaleUnit, now = new Date()): TimelineScale {
   const columns: TimelineColumn[] = [];
   let colWidth: number;
@@ -63,7 +59,6 @@ export function buildScale(unit: ScaleUnit, now = new Date()): TimelineScale {
   return { unit, colWidth, columns, totalWidth: columns.length * colWidth, currentChipLabel };
 }
 
-/** Piecewise-linear date → x mapping (columns may span unequal durations, e.g. months). */
 export function dateToX(scale: TimelineScale, date: Date): number {
   const { columns, colWidth } = scale;
   const t = date.getTime();
@@ -88,17 +83,12 @@ export function dateToX(scale: TimelineScale, date: Date): number {
   return scale.totalWidth;
 }
 
-/** Inverse of dateToX, clamped to the scale range. */
 export function xToDate(scale: TimelineScale, x: number): Date {
   const { columns, colWidth } = scale;
   const i = Math.max(0, Math.min(columns.length - 1, Math.floor(x / colWidth)));
   const col = columns[i];
   const frac = Math.max(0, Math.min(1, x / colWidth - i));
   return new Date(col.start.getTime() + frac * (col.end.getTime() - col.start.getTime()));
-}
-
-export function columnIndexAt(scale: TimelineScale, x: number): number {
-  return Math.max(0, Math.min(scale.columns.length - 1, Math.floor(x / scale.colWidth)));
 }
 
 export function columnContaining(scale: TimelineScale, date: Date): number {

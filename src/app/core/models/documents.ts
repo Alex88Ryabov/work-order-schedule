@@ -15,9 +15,7 @@ export interface WorkCenterData {
 export interface WorkOrderData {
   name: string;
   status: WorkOrderStatus;
-  /** ISO date, e.g. "2026-06-10" (inclusive) */
   startDate: string;
-  /** ISO date (inclusive) */
   endDate: string;
   workCenterId: string;
 }

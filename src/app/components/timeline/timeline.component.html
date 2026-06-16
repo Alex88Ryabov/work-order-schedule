@@ -1,4 +1,4 @@
-<div class="timeline__scroll" #scrollEl (scroll)="onScroll()">
+<div class="timeline__scroll" #scrollEl>
   <div class="timeline__table" [style.--col-w.px]="scale().colWidth">
     <div class="timeline__header-row">
       <div class="timeline__corner">Work Center</div>
@@ -46,11 +46,11 @@
                   [style.left.px]="bar.left"
                   [style.top.px]="row.barTop"
                   [style.width.px]="bar.width"
-                  (click)="$event.stopPropagation()"
+                  (click)="onBarClick($event, barMenu)"
                 >
                   <span class="timeline__bar-name">{{ bar.doc.data.name }}</span>
                   <span class="timeline__bar-badge">{{ bar.statusLabel }}</span>
-                  <div ngbDropdown class="timeline__bar-menu" container="body" placement="bottom-start bottom-end">
+                  <div ngbDropdown #barMenu="ngbDropdown" class="timeline__bar-menu" container="body" placement="bottom-start bottom-end">
                     <button
                       type="button"
                       class="timeline__bar-dots"
