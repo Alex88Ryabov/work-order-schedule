@@ -1,0 +1,38 @@
+// Status chip shown in bar tooltips and lists
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 450;
+  line-height: 17px;
+  white-space: nowrap;
+
+  &.status-chip--open {
+    background: var(--status-open-badge);
+    border-color: var(--status-open-border);
+    color: var(--status-open-text);
+  }
+
+  &.status-chip--in-progress {
+    background: var(--status-in-progress-badge);
+    border-color: var(--status-in-progress-border);
+    color: var(--status-in-progress-text);
+  }
+
+  &.status-chip--complete {
+    background: var(--status-complete-badge);
+    border-color: var(--status-complete-border);
+    color: var(--status-complete-text);
+  }
+
+  &.status-chip--blocked {
+    background: var(--status-blocked-badge);
+    border-color: var(--status-blocked-border);
+    color: var(--status-blocked-text);
+  }
+}

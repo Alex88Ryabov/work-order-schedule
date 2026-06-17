@@ -1,0 +1,63 @@
+// Colors, sizes, and shadows shared across the app
+
+:root {
+  --font-family: 'Circular Std', -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --text-primary: #030929;
+  --text-secondary: #687196;
+  --text-heading: #2f3059;
+  --text-disabled: #d8dceb;
+  --text-inverse: #f9faff;
+
+  --accent: #5659ff;
+  --accent-dark: #3e40db;
+  --accent-soft: #aaafff;
+
+  --border-grid: #e6ebf0;
+  --border-control: #d8dceb;
+  --border-popover: rgba(104, 113, 150, 0.1);
+
+  --bg-page: #ffffff;
+  --bg-muted: #f7f9fc;
+  --bg-header-row: #fafbfd;
+  --bg-row-hover: #eef0ff;
+  --bg-control-muted: #f1f3f8;
+
+  --today-line: #d4d7ff;
+  --chip-current-bg: #d4d7ff;
+
+  --shadow-control: 1px 2.5px 3px -1.5px #c8cfe9;
+  --shadow-popover: 0 4.5px 5px -1px #d8dceb, 0 2.5px 3px -1.5px #c8cfe9;
+  --shadow-panel: 0 5px 15px 0 rgba(216, 220, 235, 1) , 0 2.5px 3px -1.5px rgba(200, 207, 233, 1) , 0 4.5px 5px -1px rgba(216, 220, 235, 1);
+  --shadow-input: 0 1px 0.5px -1px #d8dceb, 0 1.5px 3px -1.5px #c8cfe9;
+
+
+  --status-open-bg: #f2feff;
+  --status-open-border: #cefbff;
+  --status-open-badge: #e4fdff;
+  --status-open-text: #00b0bf;
+
+  --status-in-progress-bg: #edeeff;
+  --status-in-progress-border: #dee0ff;
+  --status-in-progress-badge: #d6d8ff;
+  --status-in-progress-text: #3e40db;
+
+  --status-complete-bg: #f8fff3;
+  --status-complete-border: #d1fab3;
+  --status-complete-badge: #e1ffcc;
+  --status-complete-text: #08a268;
+
+  --status-blocked-bg: #fffcf1;
+  --status-blocked-border: #fff5cf;
+  --status-blocked-badge: #fceeb5;
+  --status-blocked-text: #b13600;
+
+  --centers-width: 382px;
+  --panel-width: 591px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --centers-width: 156px;
+  }
+}

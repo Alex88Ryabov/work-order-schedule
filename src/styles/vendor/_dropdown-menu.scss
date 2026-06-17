@@ -1,0 +1,41 @@
+// Theming for the timeline row action menu (ng-bootstrap dropdown)
+
+.dropdown-menu.timeline__menu {
+  width: 200px;
+  min-width: 200px;
+  margin-top: 3px;
+  padding: 12px 0;
+  border: 1px solid var(--border-popover);
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: var(--shadow-popover);
+  font-family: var(--font-family);
+
+  .timeline__menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 28px;
+    padding: 0 12px;
+    border: none;
+    background: none;
+    font-size: 14px;
+    color: var(--text-heading);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--bg-control-muted);
+      color: var(--text-heading);
+    }
+
+    &.timeline__menu-item--delete {
+      color: var(--accent-dark);
+
+      &:hover,
+      &:focus-visible {
+        color: var(--accent-dark);
+      }
+    }
+  }
+}
